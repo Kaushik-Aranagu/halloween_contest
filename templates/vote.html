@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vote - Halloween Costume Contest</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        .back-btn {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            transform: translateX(-5px);
+        }
+
+        h1 {
+            font-size: 2.2em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+        }
+
+        .voter-id-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+
+        .voter-id-section input {
+            width: 100%;
+            max-width: 300px;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            text-align: center;
+        }
+
+        .voter-id-section input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .entries-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+        }
+
+        .entry-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .entry-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .entry-image {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            background: #f0f0f0;
+        }
+
+        .photo-carousel {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            overflow: hidden;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .photo-carousel-inner {
+            display: flex;
+            transition: transform 0.3s ease;
+            height: 100%;
+        }
+
+        .carousel-photo {
+            min-width: 100%;
+            height: 300px;
+            object-fit: cover;
+            background: #f0f0f0;
+        }
+
+        .carousel-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.5);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            transition: background 0.3s;
+        }
+
+        .carousel-button:hover {
+            background: rgba(0,0,0,0.7);
+        }
+
+        .carousel-button.prev {
+            left: 10px;
+        }
+
+        .carousel-button.next {
+            right: 10px;
+        }
+
+        .carousel-button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .photo-indicator {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 10;
+        }
+
+        .indicator-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.5);
+            transition: all 0.3s;
+        }
+
+        .indicator-dot.active {
+            background: white;
+            width: 24px;
+            border-radius: 4px;
+        }
+
+        .entry-content {
+            padding: 20px;
+        }
+
+        /* Mobile Optimizations */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                max-width: 100%;
+            }
+
+            .header {
+                padding: 20px 15px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .subtitle {
+                font-size: 0.95em;
+            }
+
+            .voter-id-section {
+                padding: 15px;
+            }
+
+            .voter-id-section input {
+                max-width: 100%;
+                font-size: 16px;
+            }
+
+            .entries-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .entry-card {
+                max-width: 100%;
+            }
+
+            .entry-image,
+            .carousel-photo {
+                height: 250px;
+            }
+
+            .photo-carousel {
+                height: 250px;
+            }
+
+            .entry-content {
+                padding: 15px;
+            }
+
+            .entry-title {
+                font-size: 1.2em;
+            }
+
+            .entry-name {
+                font-size: 0.95em;
+            }
+
+            .entry-description {
+                font-size: 0.9em;
+            }
+
+            .vote-btn {
+                padding: 10px 20px;
+                font-size: 0.95em;
+            }
+
+            .carousel-button {
+                width: 35px;
+                height: 35px;
+                font-size: 1em;
+            }
+
+            .message {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+                max-width: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .entry-image,
+            .carousel-photo {
+                height: 200px;
+            }
+
+            .photo-carousel {
+                height: 200px;
+            }
+
+            .entry-title {
+                font-size: 1.1em;
+            }
+
+            .carousel-button {
+                width: 30px;
+                height: 30px;
+            }
+
+            .indicator-dot {
+                width: 6px;
+                height: 6px;
+            }
+
+            .indicator-dot.active {
+                width: 18px;
+            }
+        }
+
+        .entry-title {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .entry-name {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .entry-description {
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .vote-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .vote-count {
+            font-weight: 600;
+            color: #666;
+        }
+
+        .vote-btn {
+            padding: 10px 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .vote-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+        }
+
+        .vote-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .vote-btn.voted {
+            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+        }
+
+        .message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            z-index: 1000;
+            display: none;
+            max-width: 300px;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .message.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .no-entries {
+            background: white;
+            border-radius: 15px;
+            padding: 60px 40px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .no-entries h2 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .no-entries p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: white;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="/" class="back-btn">← Back to Home</a>
+            <h1>🗳️ Vote for Your Favorite</h1>
+            <p class="subtitle">Click on a costume to cast your vote!</p>
+            
+            <div class="voter-id-section">
+                <label for="voterId" style="display: block; margin-bottom: 10px; font-weight: 600;">
+                    Enter your name to vote:
+                </label>
+                <input type="text" id="voterId" placeholder="Your name" autocomplete="off">
+                <p style="font-size: 0.9em; color: #999; margin-top: 10px;">
+                    This helps prevent duplicate votes. You can change your vote anytime!
+                </p>
+            </div>
+        </div>
+        
+        <div id="message" class="message"></div>
+        
+        <div id="loading" class="loading">Loading entries... 🎃</div>
+        <div id="entriesContainer" class="entries-grid" style="display: none;"></div>
+        <div id="noEntries" class="no-entries" style="display: none;">
+            <h2>👻 No Entries Yet</h2>
+            <p>Be the first to enter the costume contest!</p>
+        </div>
+    </div>
+
+    <script>
+        let currentVoterId = localStorage.getItem('voterId') || '';
+        let entries = [];
+        let settings = {};
+
+        const voterIdInput = document.getElementById('voterId');
+        const entriesContainer = document.getElementById('entriesContainer');
+        const loading = document.getElementById('loading');
+        const noEntries = document.getElementById('noEntries');
+        const message = document.getElementById('message');
+
+        // Set voter ID from localStorage
+        if (currentVoterId) {
+            voterIdInput.value = currentVoterId;
+        }
+
+        // Save voter ID to localStorage
+        voterIdInput.addEventListener('input', function(e) {
+            currentVoterId = e.target.value;
+            localStorage.setItem('voterId', currentVoterId);
+        });
+
+        // Load entries on page load
+        loadEntries();
+
+        async function loadEntries() {
+            try {
+                const response = await fetch('/api/entries', {
+                    headers: {
+                        'Cache-Control': 'no-cache'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                entries = data.entries || [];
+                settings = data.settings || { show_votes: false, voting_enabled: true };
+                
+                loading.style.display = 'none';
+                
+                if (entries.length === 0) {
+                    noEntries.style.display = 'block';
+                    entriesContainer.style.display = 'none';
+                } else {
+                    noEntries.style.display = 'none';
+                    entriesContainer.style.display = 'grid';
+                    displayEntries();
+                }
+            } catch (error) {
+                console.error('Error loading entries:', error);
+                loading.style.display = 'none';
+                entriesContainer.style.display = 'none';
+                noEntries.style.display = 'none';
+                showMessage('error', 'Failed to load entries. Please refresh the page.');
+            }
+        }
+
+        function displayEntries() {
+            entriesContainer.innerHTML = entries.map(entry => {
+                const photos = entry.photos || [entry.photo]; // Support both old and new format
+                const hasMultiplePhotos = photos.length > 1;
+                
+                return `
+                    <div class="entry-card">
+                        ${createPhotoCarousel(photos, entry.id, entry.costume_name)}
+                        <div class="entry-content">
+                            <div class="entry-title">${escapeHtml(entry.costume_name)}</div>
+                            <div class="entry-name">by ${escapeHtml(entry.name)}</div>
+                            ${entry.description ? `<div class="entry-description">${escapeHtml(entry.description)}</div>` : ''}
+                            <div class="vote-section">
+                                ${settings.show_votes ? `<div class="vote-count">🎃 ${entry.vote_count} vote${entry.vote_count !== 1 ? 's' : ''}</div>` : '<div></div>'}
+                                <button class="vote-btn" onclick="vote('${entry.id}')">
+                                    Vote 👍
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Initialize carousels after rendering
+            initializeCarousels();
+        }
+
+        function createPhotoCarousel(photos, entryId, costumeName) {
+            if (photos.length === 1) {
+                // Single photo - simple display
+                return `
+                    <img src="/uploads/${photos[0]}" 
+                         alt="${costumeName}" 
+                         class="entry-image"
+                         onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22300%22%3E%3Crect fill=%22%23ddd%22 width=%22300%22 height=%22300%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23999%22%3EImage not found%3C/text%3E%3C/svg%3E'">
+                `;
+            }
+            
+            // Multiple photos - carousel
+            const photosHTML = photos.map(photo => `
+                <img src="/uploads/${photo}" 
+                     alt="${costumeName}" 
+                     class="carousel-photo"
+                     onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22300%22%3E%3Crect fill=%22%23ddd%22 width=%22300%22 height=%22300%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23999%22%3EImage not found%3C/text%3E%3C/svg%3E'">
+            `).join('');
+            
+            const indicators = photos.map((_, index) => `
+                <div class="indicator-dot ${index === 0 ? 'active' : ''}" data-index="${index}"></div>
+            `).join('');
+            
+            return `
+                <div class="photo-carousel" data-entry-id="${entryId}">
+                    <button class="carousel-button prev" onclick="moveCarousel('${entryId}', -1)">‹</button>
+                    <div class="photo-carousel-inner">
+                        ${photosHTML}
+                    </div>
+                    <button class="carousel-button next" onclick="moveCarousel('${entryId}', 1)">›</button>
+                    <div class="photo-indicator">
+                        ${indicators}
+                    </div>
+                </div>
+            `;
+        }
+
+        const carouselStates = {};
+
+        function initializeCarousels() {
+            entries.forEach(entry => {
+                const photos = entry.photos || [entry.photo];
+                if (photos.length > 1) {
+                    carouselStates[entry.id] = { currentIndex: 0, totalPhotos: photos.length };
+                }
+            });
+        }
+
+        function moveCarousel(entryId, direction) {
+            const state = carouselStates[entryId];
+            if (!state) return;
+            
+            state.currentIndex = Math.max(0, Math.min(state.totalPhotos - 1, state.currentIndex + direction));
+            
+            const carousel = document.querySelector(`.photo-carousel[data-entry-id="${entryId}"]`);
+            const inner = carousel.querySelector('.photo-carousel-inner');
+            const indicators = carousel.querySelectorAll('.indicator-dot');
+            
+            // Move carousel
+            inner.style.transform = `translateX(-${state.currentIndex * 100}%)`;
+            
+            // Update indicators
+            indicators.forEach((dot, index) => {
+                dot.classList.toggle('active', index === state.currentIndex);
+            });
+            
+            // Update button states
+            const prevBtn = carousel.querySelector('.carousel-button.prev');
+            const nextBtn = carousel.querySelector('.carousel-button.next');
+            prevBtn.disabled = state.currentIndex === 0;
+            nextBtn.disabled = state.currentIndex === state.totalPhotos - 1;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        async function vote(entryId) {
+            if (!currentVoterId.trim()) {
+                showMessage('error', 'Please enter your name first!');
+                voterIdInput.focus();
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/vote', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        entry_id: entryId,
+                        voter_id: currentVoterId.trim()
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showMessage('success', '✅ Vote submitted successfully!');
+                    await loadEntries(); // Reload to show updated counts
+                    
+                    // Show a more prominent success message
+                    const successBanner = document.createElement('div');
+                    successBanner.id = 'voteBanner';
+                    successBanner.style.cssText = 'position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #4caf50 0%, #45a049 100%); color: white; padding: 20px 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 1001; text-align: center; min-width: 300px;';
+                    successBanner.innerHTML = `
+                        <div style="font-size: 1.3em; font-weight: 700; margin-bottom: 10px;">✅ Vote Recorded!</div>
+                        <div style="margin-bottom: 15px;">You can change your vote anytime by voting for another entry.</div>
+                        <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                            <a href="/" style="padding: 10px 20px; background: white; color: #4caf50; text-decoration: none; border-radius: 8px; font-weight: 600; display: inline-block;">
+                                🏠 Home
+                            </a>
+                            <a href="/results" style="padding: 10px 20px; background: white; color: #4caf50; text-decoration: none; border-radius: 8px; font-weight: 600; display: inline-block;">
+                                🏆 View Results
+                            </a>
+                            <button onclick="document.getElementById('voteBanner').remove()" style="padding: 10px 20px; background: rgba(255,255,255,0.3); color: white; border: 2px solid white; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                                Continue Browsing
+                            </button>
+                        </div>
+                    `;
+                    document.body.appendChild(successBanner);
+                    
+                    // Auto-remove banner after 10 seconds
+                    setTimeout(() => {
+                        const banner = document.getElementById('voteBanner');
+                        if (banner) banner.remove();
+                    }, 10000);
+                } else {
+                    showMessage('error', data.error || 'Failed to submit vote');
+                }
+            } catch (error) {
+                showMessage('error', 'Network error. Please try again.');
+            }
+        }
+
+        function showMessage(type, text) {
+            message.className = `message ${type} show`;
+            message.textContent = text;
+            
+            setTimeout(() => {
+                message.classList.remove('show');
+            }, 3000);
+        }
+
+        // Auto-refresh entries every 30 seconds
+        setInterval(loadEntries, 30000);
+    </script>
+</body>
+</html>
+
+

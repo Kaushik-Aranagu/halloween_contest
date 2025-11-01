@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enter Contest - Halloween Costume Contest</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .back-btn {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            transform: translateX(-5px);
+        }
+
+        h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            color: #333;
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-input-label {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: #f5f5f5;
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1em;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .file-input-label:hover:not(:disabled) {
+            background: #ebebeb;
+            border-color: #667eea;
+        }
+
+        .file-input-label.has-file {
+            background: #e8f5e9;
+            border-color: #4caf50;
+            border-style: solid;
+        }
+
+        .file-input-label:disabled {
+            background: #f0f0f0;
+            border-color: #ddd;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        #preview {
+            margin-top: 15px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .required {
+            color: #e74c3c;
+        }
+
+        /* Mobile Optimizations */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                max-width: 100%;
+                padding: 25px 20px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .subtitle {
+                font-size: 0.95em;
+            }
+
+            .form-group label {
+                font-size: 0.95em;
+            }
+
+            input[type="text"],
+            textarea {
+                padding: 10px;
+                font-size: 16px;
+            }
+
+            .file-input-label {
+                padding: 12px;
+                font-size: 0.95em;
+            }
+
+            .submit-btn {
+                padding: 15px;
+                font-size: 1.1em;
+            }
+
+            .message {
+                padding: 12px;
+                font-size: 0.9em;
+            }
+
+            #photoCount {
+                font-size: 0.85em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px 15px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            input[type="text"],
+            textarea {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-btn">← Back to Home</a>
+        
+        <h1>📸 Enter the Contest</h1>
+        <p class="subtitle">Share your amazing costume with everyone!</p>
+        
+        <div id="message" class="message"></div>
+        
+        <form id="entryForm" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="name">Your Name <span class="required">*</span></label>
+                <input type="text" id="name" name="name" required placeholder="Enter your name">
+            </div>
+            
+            <div class="form-group">
+                <label for="costume_name">Costume Name <span class="required">*</span></label>
+                <input type="text" id="costume_name" name="costume_name" required placeholder="e.g., Vampire Queen, Zombie Pirate">
+            </div>
+            
+            <div class="form-group">
+                <label for="description">Costume Description (Optional)</label>
+                <textarea id="description" name="description" placeholder="Tell us about your costume, how you made it, inspiration, etc."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Photos (up to 5) <span class="required">*</span></label>
+                <div class="file-input-wrapper">
+                    <input type="file" id="photos" name="photos" accept="image/*" multiple style="display: none;">
+                    <button type="button" class="file-input-label" id="addPhotoBtn" onclick="document.getElementById('photos').click()">
+                        📷 Add Photos (Click to select 1-5 photos)
+                    </button>
+                </div>
+                <div id="photoCount" style="margin-top: 10px; color: #666; font-size: 0.9em;">
+                    💡 Tip: Hold Ctrl (Windows) or Cmd (Mac) to select multiple photos at once
+                </div>
+                <div id="preview" style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px;"></div>
+            </div>
+            
+            <button type="submit" class="submit-btn" id="submitBtn">
+                🎃 Submit Entry
+            </button>
+        </form>
+    </div>
+
+    <script>
+        const form = document.getElementById('entryForm');
+        const photoInput = document.getElementById('photos');
+        const addPhotoBtn = document.getElementById('addPhotoBtn');
+        const preview = document.getElementById('preview');
+        const photoCount = document.getElementById('photoCount');
+        const submitBtn = document.getElementById('submitBtn');
+        const message = document.getElementById('message');
+
+        let selectedFiles = [];
+
+        // Handle file selection and preview
+        photoInput.addEventListener('change', function(e) {
+            const newFiles = Array.from(e.target.files);
+            
+            // Add new files to existing selection
+            newFiles.forEach(file => {
+                if (selectedFiles.length < 5) {
+                    selectedFiles.push(file);
+                }
+            });
+            
+            if (selectedFiles.length > 5) {
+                showMessage('error', 'Maximum 5 photos allowed. Keeping first 5.');
+                selectedFiles = selectedFiles.slice(0, 5);
+            }
+            
+            // Reset the input so the same file can be selected again if removed
+            photoInput.value = '';
+            
+            updatePreview();
+        });
+
+        function updatePreview() {
+            if (selectedFiles.length === 0) {
+                preview.innerHTML = '<div style="color: #999; text-align: center; padding: 20px;">No photos selected yet</div>';
+                addPhotoBtn.innerHTML = '📷 Add Photos (Click to select 1-5 photos)';
+                addPhotoBtn.classList.remove('has-file');
+                photoCount.innerHTML = '💡 Tip: Hold Ctrl (Windows) or Cmd (Mac) to select multiple photos at once';
+                return;
+            }
+            
+            // Update button
+            addPhotoBtn.innerHTML = selectedFiles.length < 5 
+                ? `➕ Add More Photos (${selectedFiles.length}/5)` 
+                : `✅ 5 Photos Selected (Maximum)`;
+            addPhotoBtn.classList.add('has-file');
+            addPhotoBtn.disabled = selectedFiles.length >= 5;
+            
+            // Update count
+            photoCount.innerHTML = `${selectedFiles.length} photo${selectedFiles.length > 1 ? 's' : ''} selected`;
+            if (selectedFiles.length < 5) {
+                photoCount.innerHTML += ' - You can add more!';
+            }
+            
+            // Show previews with remove buttons
+            preview.innerHTML = '';
+            selectedFiles.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const container = document.createElement('div');
+                    container.style.cssText = 'position: relative; display: inline-block;';
+                    
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.alt = `Preview ${index + 1}`;
+                    img.style.cssText = 'width: 150px; height: 150px; object-fit: cover; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2);';
+                    
+                    const removeBtn = document.createElement('button');
+                    removeBtn.type = 'button';
+                    removeBtn.innerHTML = '❌';
+                    removeBtn.style.cssText = 'position: absolute; top: 5px; right: 5px; background: rgba(255,0,0,0.8); color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; font-size: 1em; padding: 0; display: flex; align-items: center; justify-content: center;';
+                    removeBtn.onclick = () => removePhoto(index);
+                    
+                    const label = document.createElement('div');
+                    label.textContent = `Photo ${index + 1}`;
+                    label.style.cssText = 'text-align: center; margin-top: 5px; font-size: 0.9em; color: #666;';
+                    
+                    container.appendChild(img);
+                    container.appendChild(removeBtn);
+                    container.appendChild(label);
+                    preview.appendChild(container);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function removePhoto(index) {
+            selectedFiles.splice(index, 1);
+            updatePreview();
+        }
+
+        // Handle form submission
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Validate that at least one photo is selected
+            if (selectedFiles.length === 0) {
+                showMessage('error', 'Please select at least one photo!');
+                return;
+            }
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = '⏳ Submitting...';
+            
+            // Create FormData and add selected files manually
+            const formData = new FormData();
+            formData.append('name', document.getElementById('name').value);
+            formData.append('costume_name', document.getElementById('costume_name').value);
+            formData.append('description', document.getElementById('description').value);
+            
+            // Add all selected photos
+            selectedFiles.forEach((file, index) => {
+                formData.append('photos', file);
+            });
+            
+            try {
+                const response = await fetch('/api/submit', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showMessage('success', '🎉 Entry submitted successfully! Good luck!');
+                    
+                    // Show success message with navigation options
+                    const successDiv = document.createElement('div');
+                    successDiv.style.cssText = 'background: #d4edda; border: 2px solid #c3e6cb; padding: 25px; border-radius: 15px; margin-top: 20px; text-align: center;';
+                    successDiv.innerHTML = `
+                        <h2 style="color: #155724; margin-bottom: 15px;">✅ Entry Submitted Successfully!</h2>
+                        <p style="color: #155724; margin-bottom: 20px;">Your costume has been added to the contest. Good luck!</p>
+                        <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                            <a href="/" style="padding: 12px 25px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 8px; font-weight: 600;">
+                                🏠 Back to Home
+                            </a>
+                            <a href="/vote" style="padding: 12px 25px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; text-decoration: none; border-radius: 8px; font-weight: 600;">
+                                🗳️ Vote for Others
+                            </a>
+                            <button onclick="location.reload()" style="padding: 12px 25px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                                ➕ Add Another Entry
+                            </button>
+                        </div>
+                    `;
+                    
+                    // Hide the form and show success message
+                    form.style.display = 'none';
+                    form.parentNode.appendChild(successDiv);
+                    
+                    // Scroll to top to see success message
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                } else {
+                    showMessage('error', data.error || 'Failed to submit entry');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '🎃 Submit Entry';
+                }
+            } catch (error) {
+                showMessage('error', 'Network error. Please try again.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = '🎃 Submit Entry';
+            }
+        });
+
+        function showMessage(type, text) {
+            message.className = `message ${type} show`;
+            message.textContent = text;
+        }
+
+        // Initialize preview on page load
+        updatePreview();
+    </script>
+</body>
+</html>
+
+

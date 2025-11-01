@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Results - Halloween Costume Contest</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        .back-btn {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            transform: translateX(-5px);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .controls {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+
+        .toggle-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            background: #ccc;
+            border-radius: 15px;
+            transition: background 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: #667eea;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: left 0.3s;
+        }
+
+        .toggle-switch.active::after {
+            left: 32px;
+        }
+
+        .podium {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 20px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .podium-place {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+            min-width: 280px;
+            transition: all 0.3s ease;
+        }
+
+        .podium-place:hover {
+            transform: translateY(-5px);
+        }
+
+        .podium-place.first {
+            order: 2;
+            border: 3px solid #ffd700;
+            background: linear-gradient(135deg, #fff9e6 0%, #ffffff 100%);
+        }
+
+        .podium-place.second {
+            order: 1;
+            border: 3px solid #c0c0c0;
+        }
+
+        .podium-place.third {
+            order: 3;
+            border: 3px solid #cd7f32;
+        }
+
+        .medal {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .place-image {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .place-costume {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .place-name {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .place-votes {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #764ba2;
+        }
+
+        .all-entries {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .all-entries h2 {
+            font-size: 1.8em;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .entries-list {
+            display: grid;
+            gap: 20px;
+        }
+
+        .entry-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .entry-row:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .entry-rank {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #667eea;
+            min-width: 40px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .entry-thumbnail {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            flex-shrink: 0;
+        }
+
+        .entry-info {
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .entry-costume-name {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #333;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .entry-participant {
+            color: #666;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .entry-votes {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #764ba2;
+            min-width: 60px;
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        /* Mobile Optimizations */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                max-width: 100%;
+            }
+
+            .header {
+                padding: 20px 15px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .subtitle {
+                font-size: 0.95em;
+            }
+
+            .podium {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 15px;
+            }
+
+            .podium-place {
+                order: 0 !important;
+                min-width: 100%;
+            }
+
+            .podium-place.first {
+                order: 0 !important;
+            }
+
+            .all-entries {
+                padding: 20px 15px;
+            }
+
+            .all-entries h2 {
+                font-size: 1.5em;
+            }
+
+            .entries-list {
+                gap: 12px;
+            }
+
+            .entry-row {
+                padding: 10px;
+                gap: 10px;
+            }
+
+            .entry-rank {
+                font-size: 1.2em;
+                min-width: 30px;
+            }
+
+            .entry-thumbnail {
+                width: 60px;
+                height: 60px;
+            }
+
+            .entry-costume-name {
+                font-size: 1em;
+            }
+
+            .entry-participant {
+                font-size: 0.9em;
+            }
+
+            .entry-votes {
+                font-size: 1.1em;
+                min-width: 50px;
+            }
+
+            .modal-content {
+                margin: 20px auto;
+                padding: 20px;
+                width: 95%;
+                max-height: 90vh;
+            }
+
+            .modal-carousel {
+                height: 300px;
+            }
+
+            .modal-carousel-photo {
+                height: 300px;
+            }
+
+            .modal-title {
+                font-size: 1.5em;
+            }
+
+            .modal-subtitle {
+                font-size: 1em;
+            }
+
+            .carousel-button {
+                width: 35px;
+                height: 35px;
+                font-size: 1em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .entry-rank {
+                font-size: 1em;
+                min-width: 25px;
+            }
+
+            .entry-thumbnail {
+                width: 50px;
+                height: 50px;
+            }
+
+            .entry-costume-name {
+                font-size: 0.95em;
+            }
+
+            .entry-participant {
+                font-size: 0.85em;
+            }
+
+            .entry-votes {
+                font-size: 1em;
+                min-width: 45px;
+            }
+
+            .modal-carousel {
+                height: 250px;
+            }
+
+            .modal-carousel-photo {
+                height: 250px;
+            }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: white;
+            font-size: 1.2em;
+        }
+
+        .no-entries {
+            text-align: center;
+            padding: 60px 40px;
+        }
+
+        .no-entries h2 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .no-entries p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            position: relative;
+            margin: 50px auto;
+            max-width: 900px;
+            width: 90%;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 2em;
+            font-weight: bold;
+            color: #999;
+            cursor: pointer;
+            z-index: 10;
+            background: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .modal-close:hover {
+            color: #333;
+            background: #f5f5f5;
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-right: 40px;
+        }
+
+        .modal-title {
+            font-size: 2em;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .modal-subtitle {
+            color: #667eea;
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+
+        .modal-description {
+            color: #666;
+            line-height: 1.6;
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .modal-carousel {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            overflow: hidden;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            background: #f0f0f0;
+        }
+
+        .modal-carousel-inner {
+            display: flex;
+            transition: transform 0.3s ease;
+            height: 100%;
+        }
+
+        .modal-carousel-photo {
+            min-width: 100%;
+            height: 500px;
+            object-fit: contain;
+            background: #f0f0f0;
+        }
+
+        .entry-row {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .entry-row:hover {
+            background: #e9ecef !important;
+            transform: translateX(5px);
+        }
+
+        .podium-place {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .podium-place:hover {
+            transform: translateY(-10px) scale(1.02);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="/" class="back-btn">← Back to Home</a>
+            <h1>🏆 Contest Results 🏆</h1>
+            <p class="subtitle">See who's leading the competition!</p>
+            
+            <div class="controls">
+                <label class="toggle-label">
+                    <span>Show Vote Counts</span>
+                    <div class="toggle-switch" id="toggleSwitch" onclick="toggleVotes()"></div>
+                </label>
+            </div>
+        </div>
+        
+        <div id="loading" class="loading">Loading results... 🎃</div>
+        
+        <div id="resultsContainer" style="display: none;">
+            <div id="podium" class="podium"></div>
+            <div class="all-entries">
+                <h2>All Entries</h2>
+                <div id="entriesList" class="entries-list"></div>
+            </div>
+        </div>
+        
+        <div id="noEntries" class="no-entries" style="display: none;">
+            <div style="background: white; border-radius: 15px; padding: 60px;">
+                <h2>👻 No Entries Yet</h2>
+                <p>Results will appear once people start entering the contest!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Photo Modal -->
+    <div id="photoModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle"></div>
+                <div class="modal-subtitle" id="modalSubtitle"></div>
+            </div>
+            <div class="modal-carousel" id="modalCarousel">
+                <button class="carousel-button prev" id="modalPrev" onclick="moveModalCarousel(-1)">‹</button>
+                <div class="modal-carousel-inner" id="modalCarouselInner"></div>
+                <button class="carousel-button next" id="modalNext" onclick="moveModalCarousel(1)">›</button>
+                <div class="photo-indicator" id="modalIndicator"></div>
+            </div>
+            <div class="modal-description" id="modalDescription"></div>
+            <div style="text-align: center; margin-top: 20px; color: #999;">
+                Click outside or press ESC to close
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let entries = [];
+        let settings = {};
+        let modalState = { currentIndex: 0, totalPhotos: 0 };
+
+        loadResults();
+
+        async function loadResults() {
+            try {
+                const response = await fetch('/api/entries', {
+                    headers: {
+                        'Cache-Control': 'no-cache'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                entries = data.entries || [];
+                settings = data.settings || { show_votes: false, voting_enabled: true };
+                
+                // Sort by votes
+                entries.sort((a, b) => b.vote_count - a.vote_count);
+                
+                document.getElementById('loading').style.display = 'none';
+                
+                if (entries.length === 0) {
+                    document.getElementById('noEntries').style.display = 'block';
+                    document.getElementById('resultsContainer').style.display = 'none';
+                } else {
+                    document.getElementById('noEntries').style.display = 'none';
+                    document.getElementById('resultsContainer').style.display = 'block';
+                    
+                    // Update toggle switch
+                    const toggleSwitch = document.getElementById('toggleSwitch');
+                    if (settings.show_votes) {
+                        toggleSwitch.classList.add('active');
+                    }
+                    
+                    displayResults();
+                }
+            } catch (error) {
+                console.error('Error loading results:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('resultsContainer').style.display = 'none';
+                document.getElementById('noEntries').style.display = 'none';
+                
+                const header = document.querySelector('.header');
+                const errorDiv = document.createElement('div');
+                errorDiv.style.cssText = 'background: #f8d7da; color: #721c24; padding: 20px; border-radius: 10px; margin-top: 20px;';
+                errorDiv.innerHTML = '❌ Failed to load results. Please refresh the page or check the server.';
+                header.appendChild(errorDiv);
+            }
+        }
+
+        function displayResults() {
+            displayPodium();
+            displayAllEntries();
+        }
+
+        function displayPodium() {
+            const podium = document.getElementById('podium');
+            const topThree = entries.slice(0, 3);
+            const medals = ['🥇', '🥈', '🥉'];
+            const classes = ['first', 'second', 'third'];
+            
+            if (topThree.length > 0) {
+                podium.innerHTML = topThree.map((entry, index) => {
+                    // Handle both old (photo) and new (photos array) format
+                    const firstPhoto = entry.photos ? entry.photos[0] : entry.photo;
+                    return `
+                        <div class="podium-place ${classes[index]}" onclick="openModal('${entry.id}')">
+                            <div class="medal">${medals[index]}</div>
+                            <img src="/uploads/${firstPhoto}" 
+                                 alt="${entry.costume_name}" 
+                                 class="place-image"
+                                 onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23ddd%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23999%22%3EImage not found%3C/text%3E%3C/svg%3E'">
+                            <div class="place-costume">${escapeHtml(entry.costume_name)}</div>
+                            <div class="place-name">by ${escapeHtml(entry.name)}</div>
+                            ${settings.show_votes ? `<div class="place-votes">🎃 ${entry.vote_count} vote${entry.vote_count !== 1 ? 's' : ''}</div>` : ''}
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        function displayAllEntries() {
+            const entriesList = document.getElementById('entriesList');
+            
+            entriesList.innerHTML = entries.map((entry, index) => {
+                // Handle both old (photo) and new (photos array) format
+                const firstPhoto = entry.photos ? entry.photos[0] : entry.photo;
+                const photoCount = entry.photos ? entry.photos.length : 1;
+                
+                return `
+                    <div class="entry-row" onclick="openModal('${entry.id}')">
+                        <div class="entry-rank">#${index + 1}</div>
+                        <img src="/uploads/${firstPhoto}" 
+                             alt="${entry.costume_name}" 
+                             class="entry-thumbnail"
+                             onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2280%22%3E%3Crect fill=%22%23ddd%22 width=%2280%22 height=%2280%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23999%22 font-size=%2210%22%3ENo image%3C/text%3E%3C/svg%3E'">
+                        <div class="entry-info">
+                            <div class="entry-costume-name">${escapeHtml(entry.costume_name)}</div>
+                            <div class="entry-participant">by ${escapeHtml(entry.name)}</div>
+                            ${photoCount > 1 ? `<div style="font-size: 0.85em; color: #999; margin-top: 3px;">📷 ${photoCount} photos - Click to view all</div>` : `<div style="font-size: 0.85em; color: #999; margin-top: 3px;">Click to view photo</div>`}
+                        </div>
+                        ${settings.show_votes ? `<div class="entry-votes">🎃 ${entry.vote_count}</div>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        async function toggleVotes() {
+            const toggleSwitch = document.getElementById('toggleSwitch');
+            const newState = !settings.show_votes;
+            
+            toggleSwitch.classList.toggle('active');
+            
+            try {
+                const response = await fetch('/api/settings', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        show_votes: newState
+                    })
+                });
+
+                if (response.ok) {
+                    settings.show_votes = newState;
+                    displayResults();
+                }
+            } catch (error) {
+                console.error('Failed to update settings');
+                toggleSwitch.classList.toggle('active'); // Revert on error
+            }
+        }
+
+        // Auto-refresh every 15 seconds
+        setInterval(loadResults, 15000);
+
+        // Modal functions
+        function openModal(entryId) {
+            const entry = entries.find(e => e.id === entryId);
+            if (!entry) return;
+            
+            const photos = entry.photos || [entry.photo];
+            
+            // Set modal content
+            document.getElementById('modalTitle').textContent = entry.costume_name;
+            document.getElementById('modalSubtitle').textContent = `by ${entry.name}`;
+            
+            // Set description
+            const descDiv = document.getElementById('modalDescription');
+            if (entry.description) {
+                descDiv.textContent = entry.description;
+                descDiv.style.display = 'block';
+            } else {
+                descDiv.style.display = 'none';
+            }
+            
+            // Build carousel
+            const carouselInner = document.getElementById('modalCarouselInner');
+            carouselInner.innerHTML = photos.map(photo => `
+                <img src="/uploads/${photo}" 
+                     alt="${entry.costume_name}" 
+                     class="modal-carousel-photo"
+                     onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22500%22 height=%22500%22%3E%3Crect fill=%22%23ddd%22 width=%22500%22 height=%22500%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23999%22%3EImage not found%3C/text%3E%3C/svg%3E'">
+            `).join('');
+            
+            // Build indicators
+            const indicator = document.getElementById('modalIndicator');
+            if (photos.length > 1) {
+                indicator.innerHTML = photos.map((_, index) => `
+                    <div class="indicator-dot ${index === 0 ? 'active' : ''}"></div>
+                `).join('');
+                indicator.style.display = 'flex';
+                document.getElementById('modalPrev').style.display = 'flex';
+                document.getElementById('modalNext').style.display = 'flex';
+            } else {
+                indicator.style.display = 'none';
+                document.getElementById('modalPrev').style.display = 'none';
+                document.getElementById('modalNext').style.display = 'none';
+            }
+            
+            // Reset modal state
+            modalState = { currentIndex: 0, totalPhotos: photos.length };
+            updateModalButtons();
+            
+            // Show modal
+            document.getElementById('photoModal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('photoModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        function moveModalCarousel(direction) {
+            modalState.currentIndex = Math.max(0, Math.min(modalState.totalPhotos - 1, modalState.currentIndex + direction));
+            
+            const inner = document.getElementById('modalCarouselInner');
+            const indicators = document.querySelectorAll('#modalIndicator .indicator-dot');
+            
+            // Move carousel
+            inner.style.transform = `translateX(-${modalState.currentIndex * 100}%)`;
+            
+            // Update indicators
+            indicators.forEach((dot, index) => {
+                dot.classList.toggle('active', index === modalState.currentIndex);
+            });
+            
+            updateModalButtons();
+        }
+
+        function updateModalButtons() {
+            const prevBtn = document.getElementById('modalPrev');
+            const nextBtn = document.getElementById('modalNext');
+            prevBtn.disabled = modalState.currentIndex === 0;
+            nextBtn.disabled = modalState.currentIndex === modalState.totalPhotos - 1;
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('photoModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Close modal with ESC key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // Prevent modal content clicks from closing modal
+        document.querySelector('.modal-content').addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    </script>
+</body>
+</html>
+
+
