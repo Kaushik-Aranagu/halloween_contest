@@ -89,11 +89,142 @@
             overflow: hidden;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             transition: all 0.3s ease;
+            cursor: pointer;
         }
 
         .entry-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            position: relative;
+            margin: 50px auto;
+            max-width: 900px;
+            width: 90%;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 2em;
+            font-weight: bold;
+            color: #999;
+            cursor: pointer;
+            z-index: 10;
+            background: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .modal-close:hover {
+            color: #333;
+            background: #f5f5f5;
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-right: 40px;
+        }
+
+        .modal-title {
+            font-size: 2em;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .modal-subtitle {
+            color: #667eea;
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+
+        .modal-description {
+            color: #666;
+            line-height: 1.6;
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .modal-carousel {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            overflow: hidden;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            background: #f0f0f0;
+        }
+
+        .modal-carousel-inner {
+            display: flex;
+            transition: transform 0.3s ease;
+            height: 100%;
+        }
+
+        .modal-carousel-photo {
+            min-width: 100%;
+            height: 500px;
+            object-fit: contain;
+            background: #f0f0f0;
+        }
+
+        .modal-vote-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.3em;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .modal-vote-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .modal-vote-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
 
         .entry-image {
@@ -303,6 +434,34 @@
             .indicator-dot.active {
                 width: 18px;
             }
+
+            .modal-content {
+                margin: 20px auto;
+                padding: 20px;
+                width: 95%;
+                max-height: 90vh;
+            }
+
+            .modal-carousel {
+                height: 300px;
+            }
+
+            .modal-carousel-photo {
+                height: 300px;
+            }
+
+            .modal-title {
+                font-size: 1.5em;
+            }
+
+            .modal-subtitle {
+                font-size: 1em;
+            }
+
+            .modal-vote-btn {
+                font-size: 1.1em;
+                padding: 15px;
+            }
         }
 
         .entry-title {
@@ -455,10 +614,35 @@
         </div>
     </div>
 
+    <!-- Photo Modal -->
+    <div id="photoModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle"></div>
+                <div class="modal-subtitle" id="modalSubtitle"></div>
+            </div>
+            <div class="modal-carousel" id="modalCarousel">
+                <button class="carousel-button prev" id="modalPrev" onclick="moveModalCarousel(-1)">‹</button>
+                <div class="modal-carousel-inner" id="modalCarouselInner"></div>
+                <button class="carousel-button next" id="modalNext" onclick="moveModalCarousel(1)">›</button>
+                <div class="photo-indicator" id="modalIndicator"></div>
+            </div>
+            <div class="modal-description" id="modalDescription"></div>
+            <button class="modal-vote-btn" id="modalVoteBtn" onclick="voteFromModal()">
+                🗳️ Vote for This Entry
+            </button>
+            <div style="text-align: center; margin-top: 15px; color: #999; font-size: 0.9em;">
+                Click outside or press ESC to close
+            </div>
+        </div>
+    </div>
+
     <script>
         let currentVoterId = localStorage.getItem('voterId') || '';
         let entries = [];
         let settings = {};
+        let modalState = { currentIndex: 0, totalPhotos: 0, currentEntryId: null };
 
         const voterIdInput = document.getElementById('voterId');
         const entriesContainer = document.getElementById('entriesContainer');
@@ -522,16 +706,19 @@
                 const hasMultiplePhotos = photos.length > 1;
                 
                 return `
-                    <div class="entry-card">
+                    <div class="entry-card" onclick="openModal('${entry.id}')">
                         ${createPhotoCarousel(photos, entry.id, entry.costume_name)}
                         <div class="entry-content">
                             <div class="entry-title">${escapeHtml(entry.costume_name)}</div>
                             <div class="entry-name">by ${escapeHtml(entry.name)}</div>
                             ${entry.description ? `<div class="entry-description">${escapeHtml(entry.description)}</div>` : ''}
+                            <div style="text-align: center; color: #999; font-size: 0.9em; margin: 10px 0;">
+                                👁️ Click to view ${hasMultiplePhotos ? 'all photos' : 'photo'} & vote
+                            </div>
                             <div class="vote-section">
                                 ${settings.show_votes ? `<div class="vote-count">🎃 ${entry.vote_count} vote${entry.vote_count !== 1 ? 's' : ''}</div>` : '<div></div>'}
-                                <button class="vote-btn" onclick="vote('${entry.id}')">
-                                    Vote 👍
+                                <button class="vote-btn" onclick="event.stopPropagation(); vote('${entry.id}')">
+                                    Quick Vote 👍
                                 </button>
                             </div>
                         </div>
@@ -690,8 +877,112 @@
             }, 3000);
         }
 
+        // Modal functions
+        function openModal(entryId) {
+            const entry = entries.find(e => e.id === entryId);
+            if (!entry) return;
+            
+            const photos = entry.photos || [entry.photo];
+            modalState.currentIndex = 0;
+            modalState.totalPhotos = photos.length;
+            modalState.currentEntryId = entryId;
+            
+            // Set modal content
+            document.getElementById('modalTitle').textContent = entry.costume_name;
+            document.getElementById('modalSubtitle').textContent = `by ${entry.name}`;
+            document.getElementById('modalDescription').textContent = entry.description || 'No description provided';
+            
+            // Create carousel
+            const carouselInner = document.getElementById('modalCarouselInner');
+            carouselInner.innerHTML = photos.map(photo => 
+                `<img src="/uploads/${photo}" alt="${entry.costume_name}" class="modal-carousel-photo" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22300%22><rect width=%22400%22 height=%22300%22 fill=%22%23ddd%22/><text x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 font-family=%22Arial%22 font-size=%2220%22 fill=%22%23999%22>Image not found</text></svg>'">`
+            ).join('');
+            
+            // Create indicators
+            const indicators = photos.map((_, index) => 
+                `<span class="indicator-dot ${index === 0 ? 'active' : ''}" data-index="${index}" onclick="jumpToModalPhoto(${index})"></span>`
+            ).join('');
+            document.getElementById('modalIndicator').innerHTML = indicators;
+            
+            updateModalButtons();
+            
+            // Show modal
+            document.getElementById('photoModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('photoModal').style.display = 'none';
+        }
+
+        function moveModalCarousel(direction) {
+            modalState.currentIndex += direction;
+            
+            if (modalState.currentIndex < 0) {
+                modalState.currentIndex = modalState.totalPhotos - 1;
+            } else if (modalState.currentIndex >= modalState.totalPhotos) {
+                modalState.currentIndex = 0;
+            }
+            
+            const carouselInner = document.getElementById('modalCarouselInner');
+            carouselInner.style.transform = `translateX(-${modalState.currentIndex * 100}%)`;
+            
+            // Update indicators
+            document.querySelectorAll('#modalIndicator .indicator-dot').forEach((dot, index) => {
+                dot.classList.toggle('active', index === modalState.currentIndex);
+            });
+            
+            updateModalButtons();
+        }
+
+        function jumpToModalPhoto(index) {
+            modalState.currentIndex = index;
+            const carouselInner = document.getElementById('modalCarouselInner');
+            carouselInner.style.transform = `translateX(-${modalState.currentIndex * 100}%)`;
+            
+            document.querySelectorAll('#modalIndicator .indicator-dot').forEach((dot, idx) => {
+                dot.classList.toggle('active', idx === modalState.currentIndex);
+            });
+            
+            updateModalButtons();
+        }
+
+        function updateModalButtons() {
+            const prevBtn = document.getElementById('modalPrev');
+            const nextBtn = document.getElementById('modalNext');
+            
+            if (modalState.totalPhotos <= 1) {
+                prevBtn.style.display = 'none';
+                nextBtn.style.display = 'none';
+            } else {
+                prevBtn.style.display = 'flex';
+                nextBtn.style.display = 'flex';
+            }
+        }
+
+        function voteFromModal() {
+            closeModal();
+            vote(modalState.currentEntryId);
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('photoModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // Close modal on ESC key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+
         // Auto-refresh entries every 30 seconds
         setInterval(loadEntries, 30000);
     </script>
 </body>
 </html>
+
+

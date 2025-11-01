@@ -281,6 +281,20 @@
             </ol>
         </div>
 
+        <div class="section" style="background: #fff3cd; border: 2px solid #ffc107;">
+            <h2>⚠️ Danger Zone</h2>
+            <p style="color: #856404;">
+                <strong>Reset Contest:</strong> This will permanently delete ALL entries, votes, and photos. 
+                This action cannot be undone!
+            </p>
+            <p style="color: #856404; font-size: 0.9em;">
+                💡 <strong>Tip:</strong> Download a backup first before resetting.
+            </p>
+            <button onclick="resetContest()" class="btn" style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white;">
+                🗑️ Reset All Contest Data
+            </button>
+        </div>
+
         <div class="section">
             <h2>📁 File Locations</h2>
             <ul style="color: #666; line-height: 1.8; margin-left: 20px;">
@@ -329,6 +343,36 @@
 
         // Refresh stats every 30 seconds
         setInterval(loadStats, 30000);
+
+        // Reset contest function
+        async function resetContest() {
+            // Double confirmation
+            const firstConfirm = confirm('⚠️ WARNING: This will delete ALL contest data!\n\nAre you sure you want to reset the contest?');
+            if (!firstConfirm) return;
+            
+            const secondConfirm = confirm('🚨 FINAL WARNING: This action CANNOT be undone!\n\nAll entries, votes, and photos will be permanently deleted.\n\nClick OK to proceed with reset.');
+            if (!secondConfirm) return;
+            
+            try {
+                const response = await fetch('/api/admin/reset', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    alert('✅ Contest has been reset successfully!\n\nAll data has been cleared. Refreshing page...');
+                    location.reload();
+                } else {
+                    alert('❌ Error: ' + (result.error || 'Failed to reset contest'));
+                }
+            } catch (error) {
+                alert('❌ Network error: ' + error.message);
+            }
+        }
     </script>
 </body>
 </html>

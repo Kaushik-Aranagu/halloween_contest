@@ -6,15 +6,29 @@ from werkzeug.utils import secure_filename
 import secrets
 
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = 'uploads'
+
+# Configuration - Use persistent storage on Railway or local directory
+# Railway Volume should be mounted at /data
+DATA_DIR = os.environ.get('DATA_DIR', os.path.dirname(os.path.abspath(__file__)))
+UPLOAD_FOLDER = os.path.join(DATA_DIR, 'uploads')
+DATA_FILE = os.path.join(DATA_DIR, 'contest_data.json')
+BACKUP_DIR = os.path.join(DATA_DIR, 'backups')
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 app.config['SECRET_KEY'] = secrets.token_hex(16)
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
-DATA_FILE = 'contest_data.json'
 
 # Create necessary directories
-os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(BACKUP_DIR, exist_ok=True)
+
+# Log data directory for debugging
+print(f"📁 Data directory: {DATA_DIR}")
+print(f"📁 Upload folder: {UPLOAD_FOLDER}")
+print(f"📁 Data file: {DATA_FILE}")
+print(f"📁 Backup directory: {BACKUP_DIR}")
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -43,13 +57,12 @@ def backup_data():
     if not os.path.exists(DATA_FILE):
         return
     
-    # Create backups directory
-    backup_dir = 'backups'
-    os.makedirs(backup_dir, exist_ok=True)
+    # Create backups directory (already created at startup, but just in case)
+    os.makedirs(BACKUP_DIR, exist_ok=True)
     
     # Create timestamped backup
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-    backup_file = os.path.join(backup_dir, f'contest_backup_{timestamp}.json')
+    backup_file = os.path.join(BACKUP_DIR, f'contest_backup_{timestamp}.json')
     
     # Copy current data to backup
     data = load_data()
@@ -57,10 +70,10 @@ def backup_data():
         json.dump(data, f, indent=2)
     
     # Keep only last 10 backups
-    backups = sorted([f for f in os.listdir(backup_dir) if f.startswith('contest_backup_')])
+    backups = sorted([f for f in os.listdir(BACKUP_DIR) if f.startswith('contest_backup_')])
     if len(backups) > 10:
         for old_backup in backups[:-10]:
-            os.remove(os.path.join(backup_dir, old_backup))
+            os.remove(os.path.join(BACKUP_DIR, old_backup))
 
 @app.route('/')
 def index():
@@ -280,6 +293,30 @@ def export_csv():
 def admin():
     """Admin page for backup and data management"""
     return render_template('admin.html')
+
+@app.route('/api/admin/reset', methods=['POST'])
+def reset_contest():
+    """Reset all contest data (admin only)"""
+    try:
+        import shutil
+        
+        # Delete the data file
+        if os.path.exists(DATA_FILE):
+            os.remove(DATA_FILE)
+        
+        # Delete uploads
+        if os.path.exists(UPLOAD_FOLDER):
+            shutil.rmtree(UPLOAD_FOLDER)
+            os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+        
+        # Delete backups
+        if os.path.exists(BACKUP_DIR):
+            shutil.rmtree(BACKUP_DIR)
+            os.makedirs(BACKUP_DIR, exist_ok=True)
+        
+        return jsonify({'success': True, 'message': 'Contest reset successfully'})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     # Check if running in production or development

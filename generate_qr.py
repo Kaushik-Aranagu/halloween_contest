@@ -17,7 +17,8 @@ def get_local_ip():
 def generate_qr_code():
     """Generate a QR code for the contest URL"""
     local_ip = get_local_ip()
-    url = f"http://{local_ip}:5000"
+    # url = f"http://{local_ip}:5000"
+    url = f"https://halloweencontest-production.up.railway.app/"
     
     print("\n" + "="*60)
     print("🎃 HALLOWEEN COSTUME CONTEST - QR CODE GENERATOR 🎃")
